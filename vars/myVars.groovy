@@ -116,7 +116,7 @@ def getChangeString() {
 		for (int j = 0; j < entries.length; j++) {
 			def entry = entries[j]
 			// pay attention that getVersion can run only w/o groovy sandbox
-			changeString += "${myVars.commitInfo(j+1, entry)}"
+			changeString += "${commitInfo(j+1, entry)}"
 		}
 	}
 
