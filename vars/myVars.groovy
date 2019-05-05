@@ -96,7 +96,7 @@ def sendNotification(user) {
 def commitInfo(idx, commit) {
 	// convert EOL to HTML formating
 	String newMsg = commit.msg.replaceAll("(\r\n|\n)", "<br />")
-	return commit != null ? "${idx}. [CS:${commit.getRevision()}@${commit.getRepoName()}] by ${commit.getAuthor()}<br />${newMsg}<br /><br />" : ""
+	return commit != null ? "${idx}. [CS:${commit.Version()}@${commit.getRepoName()}] by ${commit.getAuthor()}<br />${newMsg}<br /><br />" : ""
 }
 
 @NonCPS
