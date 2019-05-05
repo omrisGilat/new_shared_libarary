@@ -109,3 +109,7 @@ def getChangeString() {
 
 	return changeString
 }
+
+def testMethod(){
+echo "test Passed"
+}
