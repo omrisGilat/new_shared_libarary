@@ -113,3 +113,52 @@ def getChangeString() {
 def testMethod(){
 echo "test Passed"
 }
+
+@NonCPS
+def sendNotification(user) {
+
+	emailext (
+		mimeType: 'text/html',
+		to: "${user}@gilat.com",
+		subject: '$PROJECT_NAME - $BUILD_DISPLAY_NAME - $BUILD_STATUS!',
+		body: '''
+			<p>$BUILD_STATUS - $PROJECT_NAME [$BUILD_DISPLAY_NAME]:</p>
+			<p>Check console output at <a href="$BUILD_URL">$PROJECT_NAME [$BUILD_DISPLAY_NAME]</a> to view the results.</p>
+			''' + getChangeString()
+	)
+}
+
+@NonCPS
+def commitInfo(idx, commit) {
+	// convert EOL to HTML formating
+	String newMsg = commit.msg.replaceAll("(\r\n|\n)", "<br />")
+	return commit != null ? "${idx}. [CS:${commit.getVersion()}@${commit.getRepoName()}] by ${commit.getAuthor()}<br />${newMsg}<br /><br />" : ""
+}
+
+@NonCPS
+def getChangeString() {
+	/*
+	The ChangeLogSets format can be viewed in the following URL (JSON format)
+	http://ci-jenkins:8080/job/<job name>/api/json?pretty=true&tree=builds[changeSets[items[*]]]
+	*/
+	String changeString = ""
+
+	echo "Gathering SCM changes..."
+	def changeLogSets = currentBuild.changeSets
+
+	for (int i = 0; i < changeLogSets.size(); i++) {
+		def entries = changeLogSets[i].items
+
+		for (int j = 0; j < entries.length; j++) {
+			def entry = entries[j]
+			// pay attention that getVersion can run only w/o groovy sandbox
+			changeString += "${commitInfo(j+1, entry)}"
+		}
+	}
+
+	if (!changeString) {
+		changeString = "No new changes since last build."
+	}
+
+	return changeString
+}
